@@ -21,6 +21,8 @@ def run(command):
         sys.exit(command)
 
 def main():
+    if "MINGW_HOME" in os.environ:
+        os.environ["PATH"] += os.pathsep + os.environ["MINGW_HOME"]
     generator = os.environ["CMAKE_GENERATOR"]
     multi_config = generator.startswith("Visual")
     command = 'cmake . -G "%s"' % generator

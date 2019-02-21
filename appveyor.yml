@@ -5,8 +5,7 @@ environment:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CMAKE_SH: "CMAKE_SH-NOTFOUND"
           CMAKE_GENERATOR: "MinGW Makefiles"
-          CMAKE_MAKE_PROGRAM: "C:\\mingw-w64\\x86_64-7.2.0-posix-seh-rt_v5-rev1\\mingw64\\bin\\mingw32-make.exe"
-          CC: "C:\\mingw-w64\\x86_64-7.2.0-posix-seh-rt_v5-rev1\\mingw64\\bin\\gcc.exe"
+          MINGW_HOME: "C:\\mingw-w64\\x86_64-7.2.0-posix-seh-rt_v5-rev1\\mingw64\\bin"
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CMAKE_GENERATOR: "Visual Studio 12 2013"
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
@@ -22,5 +21,3 @@ environment:
 
 test_script:
     - python build.py
-on_finish:
-    - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
