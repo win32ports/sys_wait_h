@@ -2,31 +2,38 @@
 # -*- coding: utf-8 -*-
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
+from __future__ import print_function
 import os
 import sys
+
+def show_file(filename):
+    if os.path.isfile(filename):
+        with open(filename, 'r') as f:
+            contents = f.read()
+            print("%s:" % filename)
+            print(contents)
 
 def run(command):
     status = os.system(command)
     if 0 != status:
+        show_file(os.path.join("CMakeFiles", "CMakeOutput.log"))
+        show_file(os.path.join("CMakeFiles", "CMakeError.log"))
         sys.exit(command)
 
-def remove_sh_from_path():
-    path = os.environ["PATH"]
-    path = path.split(os.pathsep)
-    for entry in path:
-        if os.path.isfile(os.path.join(entry, "sh.exe")):
-            path.remove(entry)
-    path = os.pathsep.join(path)
-    os.environ["PATH"] = path
-
 def main():
-    remove_sh_from_path()
     generator = os.environ["CMAKE_GENERATOR"]
+    multi_config = generator.startswith("Visual")
     command = 'cmake . -G "%s"' % generator
-    if "CMAKE_MAKE_PROGRAM" in os.environ:
-        command += ' -DCMAKE_MAKE_PROGRAM="%s"' % os.environ["CMAKE_MAKE_PROGRAM"]
+    for env in os.environ:
+        if env.startswith("CMAKE"):
+            command += ' -D%s="%s"' % (env, os.environ[env])
+    if not multi_config:
+        command += ' -DCMAKE_BUILD_TYPE=Release'
     run(command)
-    run('cmake --build . --config Release')
+    command = 'cmake --build .'
+    if multi_config:
+        command += ' --config Release'
+    run(command)
 
 if __name__ == '__main__':
     main()
