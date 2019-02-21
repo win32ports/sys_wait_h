@@ -221,9 +221,6 @@ static int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * 
     int (*filter)(PROCESSENTRY32*, DWORD);
     PROCESSENTRY32 pe;
     DWORD wait_status = 0, exit_code = 0;
-    int untraced = WUNTRACED == (WUNTRACED & options);
-    int nowait = __WNOWAIT == (__WNOWAIT & options);
-    int continued = __WCONTINUED == (__WCONTINUED & options);
     int nohang = WNOHANG == (WNOHANG & options);
     options &= ~(WUNTRACED | __WNOWAIT | __WCONTINUED | WNOHANG);
     if (options)
