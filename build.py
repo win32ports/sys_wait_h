@@ -5,7 +5,7 @@
 import os
 import sys
 
-def run(command)
+def run(command):
     status = os.system(command)
     if 0 != status:
         sys.exit(command)
