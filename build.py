@@ -3,11 +3,17 @@
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4
 
 import os
+import sys
+
+def run(command)
+    status = os.system(command)
+    if 0 != status:
+        sys.exit(command)
 
 def main():
     generator = os.environ["CMAKE_GENERATOR"]
-    os.system('cmake . -G "%s"' % generator)
-    os.system('cmake --build . --config Release')
+    run('cmake . -G "%s"' % generator)
+    run('cmake --build . --config Release')
 
 if __name__ == '__main__':
     main()
