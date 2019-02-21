@@ -24,7 +24,7 @@ def main():
     generator = os.environ["CMAKE_GENERATOR"]
     command = 'cmake . -G "%s"' % generator
     if "CMAKE_MAKE_PROGRAM" in os.environ:
-        command += "-D%s" % os.environ["CMAKE_MAKE_PROGRAM"]
+        command += " -D%s" % os.environ["CMAKE_MAKE_PROGRAM"]
     run(command)
     run('cmake --build . --config Release')
 
