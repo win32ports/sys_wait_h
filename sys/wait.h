@@ -34,7 +34,7 @@ SOFTWARE.
 #else /* _WIN32 */
 
 #ifdef __cplusplus
-//extern "C" {
+extern "C" {
 #endif /* __cplusplus */
 
 #ifdef _MSC_VER
@@ -367,7 +367,7 @@ pid_t wait4(pid_t pid, int * status, int options, struct rusage * rusage)
 #endif /* _XOPEN_SOURCE */
 
 #ifdef __cplusplus
-//}
+}
 #endif /* __cplusplus */
 
 #endif /* _WIN32 */
