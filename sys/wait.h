@@ -37,6 +37,8 @@ SOFTWARE.
 extern "C" {
 #endif /* __cplusplus */
 
+#include <Windows.h>
+
 #ifdef _MSC_VER
 #include <winsock.h> /* for timeval */
 #endif /* _MSC_VER */
