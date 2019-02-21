@@ -195,17 +195,17 @@ idtype_t;
 
 #endif /* _XOPEN_SOURCE  */
 
-int __filter_anychild(PROCESSENTRY32 * pe, DWORD pid)
+static int __filter_anychild(PROCESSENTRY32 * pe, DWORD pid)
 {
     return pe->th32ParentProcessID == GetCurrentProcessId();
 }
 
-int __filter_pid(PROCESSENTRY32 * pe, DWORD pid)
+static int __filter_pid(PROCESSENTRY32 * pe, DWORD pid)
 {
     return pe->th32ProcessID == pid;
 }
 
-void __filetime2timeval(FILETIME time, struct timeval * out)
+static void __filetime2timeval(FILETIME time, struct timeval * out)
 {
     ULONGLONG value = time.dwHighDateTime;
     value = (value << 32) | time.dwLowDateTime;
@@ -343,7 +343,7 @@ static int wait(int *status)
 
 #ifdef _XOPEN_SOURCE
 
-int waitid(idtype_t idtype, id_t id, siginfo_t * infop, int options)
+static int waitid(idtype_t idtype, id_t id, siginfo_t * infop, int options)
 {
     pid_t pid;
     switch (idtype)
@@ -356,12 +356,12 @@ int waitid(idtype_t idtype, id_t id, siginfo_t * infop, int options)
     return __waitpid_internal(pid, NULL, options, infop, NULL);
 }
 
-pid_t wait3(int * status, int options, struct rusage * rusage)
+static pid_t wait3(int * status, int options, struct rusage * rusage)
 {
     return __waitpid_internal(-1, status, options, NULL, rusage);
 }
 
-pid_t wait4(pid_t pid, int * status, int options, struct rusage * rusage)
+static pid_t wait4(pid_t pid, int * status, int options, struct rusage * rusage)
 {
     return __waitpid_internal(pid, status, options, NULL, rusage);
 }
