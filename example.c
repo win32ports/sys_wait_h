@@ -1,6 +1,11 @@
 #define _XOPEN_SOURCE 500
 
 #include <stdlib.h>
+
+#ifdef __MINGW32__
+#include <sys/types.h>
+#endif /* __MINGW32__ */
+
 #include <sys/wait.h>
 
 #include <windows.h>

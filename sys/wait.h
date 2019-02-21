@@ -115,11 +115,12 @@ extern "C" {
 #define WSTOPSIG(status) __WSTOPSIG(status)
 #endif /* WSTOPSIG */
 
-#ifndef __pid_t_defined
+#if !defined(__pid_t_defined) && !defined(_PID_T_)
 #define __pid_t_defined 1
+#define _PID_T_
 typedef int __pid_t;
 typedef __pid_t pid_t;
-#endif /* __pid_t_defined */
+#endif /* !defined(__pid_t_defined) && !defined(_PID_T_) */
 
 #ifndef __id_t_defined
 #define __id_t_defined 1
