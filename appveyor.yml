@@ -20,4 +20,5 @@ environment:
           CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
 
 test_script:
+    dir /B /S C:\*gcc.exe
     python build.py
