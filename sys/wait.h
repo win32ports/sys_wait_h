@@ -215,7 +215,6 @@ static void __filetime2timeval(FILETIME time, struct timeval * out)
 
 static int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * infop, struct rusage * rusage)
 {
-    int retval = 0;
     int saved_status = 0;
     HANDLE hProcess = INVALID_HANDLE_VALUE, hSnapshot = INVALID_HANDLE_VALUE;
     int (*filter)(PROCESSENTRY32*, DWORD);
@@ -237,7 +236,6 @@ static int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * 
     else if (pid < -1)
     {
         /* wait for any process from the group */
-        int group_id = -pid;
         abort(); /* not implemented */
     }
     else if (pid == 0)
