@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(sys_wait_h)
+project(sys_wait_h LANGUAGES C)
 
 add_executable(example example.c sys/wait.h)
 
