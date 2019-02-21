@@ -2,10 +2,10 @@ build: false
 
 environment:
     matrix:
-        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CMAKE_GENERATOR: "MinGW Makefiles"
-          CMAKE_MAKE_PROGRAM: "C:\\MinGW\\bin\\mingw32-make.exe"
-          CC: "C:\\MinGW\\bin\\gcc.exe"
+          CMAKE_MAKE_PROGRAM: "C:\\mingw-w64\\x86_64-7.2.0-posix-seh-rt_v5-rev1\\mingw64\\bin\\mingw32-make.exe"
+          CC: "C:\\mingw-w64\\x86_64-7.2.0-posix-seh-rt_v5-rev1\\mingw64\\bin\\gcc.exe"
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CMAKE_GENERATOR: "Visual Studio 12 2013"
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
@@ -20,5 +20,5 @@ environment:
           CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
 
 test_script:
-    dir /B /S C:\*gcc.exe
-    python build.py
+    - dir /B /S C:\mingw*gcc.exe
+    - python build.py
