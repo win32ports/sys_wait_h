@@ -4,6 +4,7 @@ environment:
     matrix:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           CMAKE_GENERATOR: "MinGW Makefiles"
+          CMAKE_MAKE_PROGRAM: "C:\\MinGW\\bin\\mingw32-make.exe"
           CC: "C:\\MinGW\\bin\\gcc.exe"
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CMAKE_GENERATOR: "Visual Studio 12 2013"
