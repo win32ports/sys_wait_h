@@ -9,7 +9,7 @@ environment:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CMAKE_GENERATOR: "Ninja"
           CC: "C:\\Program Files\\LLVM\\bin\\clang-cl.exe"
-          VCVARS: "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
+          VCVARS: "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\vcvarsall.bat"
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
           CMAKE_GENERATOR: "Visual Studio 12 2013"
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
