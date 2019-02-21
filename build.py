@@ -6,8 +6,8 @@ import os
 
 def main():
     generator = os.environ["CMAKE_GENERATOR"]
-    os.system("cmake -G %s" % generator)
-    os.system("cmake --build . --config Release")
+    os.system('cmake . -G "%s"' % generator)
+    os.system('cmake --build . --config Release')
 
 if __name__ == '__main__':
     main()
