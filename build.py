@@ -14,6 +14,8 @@ def show_file(filename):
             print(contents)
 
 def run(command):
+    if "VCVARS" in os.environ:
+        command = 'call "%s" amd64" % os.environ["VCVARS"] + command
     status = os.system(command)
     if 0 != status:
         show_file(os.path.join("CMakeFiles", "CMakeOutput.log"))
