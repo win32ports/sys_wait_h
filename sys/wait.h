@@ -37,19 +37,125 @@ SOFTWARE.
 extern "C" {
 #endif /* __cplusplus */
 
-#include <Windows.h>
-
-#ifdef _MSC_VER
-#include <winsock.h> /* for timeval */
-#endif /* _MSC_VER */
-
 #ifdef __GNUC__
 #include <sys/time.h> /* for timeval */
 #endif /* __GNUC__  */
 
 #include <errno.h>
+#include <string.h>
 
-#include <TlHelp32.h>
+#ifndef _INC_WINDOWS
+
+typedef unsigned long DWORD;
+typedef DWORD * LPDWORD;
+typedef long long LONG_PTR;
+typedef unsigned long long ULONG_PTR;
+typedef long LONG;
+typedef wchar_t WCHAR;
+typedef int BOOL;
+typedef void VOID;
+typedef void * HANDLE;
+
+#ifndef MAX_PATH
+#define MAX_PATH 260
+#endif /* MAX_PATH */
+
+#ifndef WINAPI
+#define WINAPI __stdcall
+#endif /* WINAPI */
+
+#ifndef DECLSPEC_DLLIMPORT
+#ifdef _MSC_VER
+#define DECLSPEC_DLLIMPORT __declspec(dllimport)
+#else /* _MSC_VER */
+#define DECLSPEC_DLLIMPORT
+#endif /* _MSC_VER */
+#endif /* DECLSPEC_DLLIMPORT */
+
+#ifndef WINBASEAPI
+#define WINBASEAPI DECLSPEC_DLLIMPORT
+#endif /* WINBASEAPI */
+
+#ifndef INVALID_HANDLE_VALUE
+#define INVALID_HANDLE_VALUE ((HANDLE)(LONG_PTR)-1)
+#endif /* INVALID_HANDLE_VALUE */
+
+#ifndef SYNCHRONIZE
+#define SYNCHRONIZE (0x00100000L)
+#endif /* SYNCHRONIZE */
+
+#ifndef PROCESS_QUERY_INFORMATION
+#define PROCESS_QUERY_INFORMATION (0x0400)
+#endif /* PROCESS_QUERY_INFORMATION */
+
+#ifndef INFINITE
+#define INFINITE 0xFFFFFFFF
+#endif /* INFINITE */
+
+#ifndef WAIT_OBJECT_0
+#define WAIT_OBJECT_0 0
+#endif /* WAIT_OBJECT_0 */
+
+#ifndef WAIT_TIMEOUT
+#define WAIT_TIMEOUT 258L
+#endif /* WAIT_TIMEOUT */
+
+typedef struct private_FILETIME {
+    DWORD dwLowDateTime;
+    DWORD dwHighDateTime;
+} private_FILETIME, *private_PFILETIME, *private_LPFILETIME;
+
+#define FILETIME private_FILETIME
+#define PFILETIME private_PFILETIME
+#define LPFILETIME private_LPFILETIME
+
+WINBASEAPI DWORD WINAPI GetCurrentProcessId(VOID);
+WINBASEAPI BOOL WINAPI CloseHandle(HANDLE hObject);
+WINBASEAPI HANDLE WINAPI OpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId);
+WINBASEAPI DWORD WINAPI WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds);
+WINBASEAPI BOOL WINAPI GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
+WINBASEAPI BOOL WINAPI GetProcessTimes(HANDLE hProcess, LPFILETIME lpCreationTime, LPFILETIME lpExitTime, LPFILETIME lpKernelTime, LPFILETIME lpUserTime);
+
+#endif /* _INC_WINDOWS */
+
+#ifndef _WINSOCKAPI_
+
+struct private_timeval {
+    long    tv_sec;
+    long    tv_usec;
+};
+
+#define timeval private_timeval
+
+#endif /* _WINSOCKAPI_ */
+
+#ifndef _INC_TOOLHELP32
+
+typedef struct tagPROCESSENTRY32W
+{
+    DWORD   dwSize;
+    DWORD   cntUsage;
+    DWORD   th32ProcessID;
+    ULONG_PTR th32DefaultHeapID;
+    DWORD   th32ModuleID;
+    DWORD   cntThreads;
+    DWORD   th32ParentProcessID;
+    LONG    pcPriClassBase;
+    DWORD   dwFlags;
+    WCHAR   szExeFile[MAX_PATH];
+} PROCESSENTRY32W;
+typedef PROCESSENTRY32W *  PPROCESSENTRY32W;
+typedef PROCESSENTRY32W *  LPPROCESSENTRY32W;
+
+#ifndef TH32CS_SNAPPROCESS
+#define TH32CS_SNAPPROCESS 2
+#endif /* TH32CS_SNAPPROCESS */
+
+HANDLE WINAPI CreateToolhelp32Snapshot(DWORD dwFlags, DWORD th32ProcessID);
+BOOL WINAPI Process32FirstW(HANDLE hSnapshot, LPPROCESSENTRY32W lppe);
+BOOL WINAPI Process32NextW(HANDLE hSnapshot, LPPROCESSENTRY32W lppe);
+
+#endif /* _INC_TOOLHELP32 */
 
 #ifndef WNOHANG
 #define WNOHANG 1
@@ -196,19 +302,19 @@ idtype_t;
 
 #endif /* _XOPEN_SOURCE  */
 
-inline int __filter_anychild(PROCESSENTRY32 * pe, DWORD pid)
+inline int __filter_anychild(PROCESSENTRY32W * pe, DWORD pid)
 {
     return pe->th32ParentProcessID == GetCurrentProcessId();
 }
 
-inline int __filter_pid(PROCESSENTRY32 * pe, DWORD pid)
+inline int __filter_pid(PROCESSENTRY32W * pe, DWORD pid)
 {
     return pe->th32ProcessID == pid;
 }
 
 inline void __filetime2timeval(FILETIME time, struct timeval * out)
 {
-    ULONGLONG value = time.dwHighDateTime;
+    unsigned long long value = time.dwHighDateTime;
     value = (value << 32) | time.dwLowDateTime;
     out->tv_sec = (long)(value / 1000000);
     out->tv_usec = (long)(value % 1000000);
@@ -218,8 +324,8 @@ inline int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * 
 {
     int saved_status = 0;
     HANDLE hProcess = INVALID_HANDLE_VALUE, hSnapshot = INVALID_HANDLE_VALUE;
-    int (*filter)(PROCESSENTRY32*, DWORD);
-    PROCESSENTRY32 pe;
+    int (*filter)(PROCESSENTRY32W*, DWORD);
+    PROCESSENTRY32W pe;
     DWORD wait_status = 0, exit_code = 0;
     int nohang = WNOHANG == (WNOHANG & options);
     options &= ~(WUNTRACED | __WNOWAIT | __WCONTINUED | WNOHANG);
@@ -257,7 +363,7 @@ inline int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * 
         return -1;
     }
     pe.dwSize = sizeof(pe);
-    if (!Process32First(hSnapshot, &pe))
+    if (!Process32FirstW(hSnapshot, &pe))
     {
         CloseHandle(hSnapshot);
         errno = ECHILD;
@@ -267,7 +373,7 @@ inline int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * 
     {
         if (filter(&pe, pid))
         {    
-            hProcess = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_INFORMATION, FALSE, pe.th32ProcessID);
+            hProcess = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_INFORMATION, 0, pe.th32ProcessID);
             if (INVALID_HANDLE_VALUE == hProcess)
             {
                 CloseHandle(hSnapshot);
@@ -277,7 +383,7 @@ inline int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * 
             break;
         }
     }
-    while (Process32Next(hSnapshot, &pe));
+    while (Process32NextW(hSnapshot, &pe));
     if (INVALID_HANDLE_VALUE == hProcess)
     {
         CloseHandle(hSnapshot);
@@ -363,6 +469,22 @@ inline pid_t wait4(pid_t pid, int * status, int options, struct rusage * rusage)
 }
 
 #endif /* _XOPEN_SOURCE */
+
+#ifndef _INC_WINDOWS
+
+#undef WAIT_OBJECT_0
+
+#undef FILETIME
+#undef PFILETIME
+#undef LPFILETIME
+
+#endif /* _INC_WINDOWS */
+
+#ifndef _WINSOCKAPI_
+
+#undef timeval
+
+#endif /* _WINSOCKAPI_ */
 
 #ifdef __cplusplus
 }
