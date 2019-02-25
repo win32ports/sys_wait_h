@@ -302,17 +302,17 @@ idtype_t;
 
 #endif /* _XOPEN_SOURCE  */
 
-inline int __filter_anychild(PROCESSENTRY32W * pe, DWORD pid)
+static int __filter_anychild(PROCESSENTRY32W * pe, DWORD pid)
 {
     return pe->th32ParentProcessID == GetCurrentProcessId();
 }
 
-inline int __filter_pid(PROCESSENTRY32W * pe, DWORD pid)
+static int __filter_pid(PROCESSENTRY32W * pe, DWORD pid)
 {
     return pe->th32ProcessID == pid;
 }
 
-inline void __filetime2timeval(FILETIME time, struct timeval * out)
+static void __filetime2timeval(FILETIME time, struct timeval * out)
 {
     unsigned long long value = time.dwHighDateTime;
     value = (value << 32) | time.dwLowDateTime;
@@ -320,7 +320,7 @@ inline void __filetime2timeval(FILETIME time, struct timeval * out)
     out->tv_usec = (long)(value % 1000000);
 }
 
-inline int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * infop, struct rusage * rusage)
+static int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * infop, struct rusage * rusage)
 {
     int saved_status = 0;
     HANDLE hProcess = INVALID_HANDLE_VALUE, hSnapshot = INVALID_HANDLE_VALUE;
@@ -433,19 +433,19 @@ inline int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * 
     return pe.th32ParentProcessID;
 }
 
-inline int waitpid(pid_t pid, int * status, int options)
+static int waitpid(pid_t pid, int * status, int options)
 {
     return __waitpid_internal(pid, status, options, NULL, NULL);
 }
 
-inline int wait(int *status)
+static int wait(int *status)
 {
     return __waitpid_internal(-1, status, 0, NULL, NULL);
 }
 
 #ifdef _XOPEN_SOURCE
 
-inline int waitid(idtype_t idtype, id_t id, siginfo_t * infop, int options)
+static int waitid(idtype_t idtype, id_t id, siginfo_t * infop, int options)
 {
     pid_t pid;
     switch (idtype)
@@ -458,12 +458,12 @@ inline int waitid(idtype_t idtype, id_t id, siginfo_t * infop, int options)
     return __waitpid_internal(pid, NULL, options, infop, NULL);
 }
 
-inline pid_t wait3(int * status, int options, struct rusage * rusage)
+static pid_t wait3(int * status, int options, struct rusage * rusage)
 {
     return __waitpid_internal(-1, status, options, NULL, rusage);
 }
 
-inline pid_t wait4(pid_t pid, int * status, int options, struct rusage * rusage)
+static pid_t wait4(pid_t pid, int * status, int options, struct rusage * rusage)
 {
     return __waitpid_internal(pid, status, options, NULL, rusage);
 }
