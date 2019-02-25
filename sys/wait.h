@@ -111,21 +111,29 @@ typedef void * HANDLE;
 #define WAIT_TIMEOUT 258L
 #endif /* WAIT_TIMEOUT */
 
-typedef struct private_FILETIME {
+/*
+FIXME: causes FILETIME to conflict
+#ifndef _FILETIME_
+#define _FILETIME_
+
+typedef struct FILETIME {
     DWORD dwLowDateTime;
     DWORD dwHighDateTime;
-} private_FILETIME, *private_PFILETIME, *private_LPFILETIME;
+} FILETIME, *PFILETIME, *LPFILETIME;
 
-#define FILETIME private_FILETIME
-#define PFILETIME private_PFILETIME
-#define LPFILETIME private_LPFILETIME
+#endif
+*/
 
 WINBASEAPI DWORD WINAPI GetCurrentProcessId(VOID);
 WINBASEAPI BOOL WINAPI CloseHandle(HANDLE hObject);
 WINBASEAPI HANDLE WINAPI OpenProcess(DWORD dwDesiredAccess, BOOL bInheritHandle, DWORD dwProcessId);
 WINBASEAPI DWORD WINAPI WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds);
 WINBASEAPI BOOL WINAPI GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
+
+/*
+FIXME: causes FILETIME to conflict
 WINBASEAPI BOOL WINAPI GetProcessTimes(HANDLE hProcess, LPFILETIME lpCreationTime, LPFILETIME lpExitTime, LPFILETIME lpKernelTime, LPFILETIME lpUserTime);
+*/
 
 #endif /* _INC_WINDOWS */
 
@@ -323,6 +331,8 @@ static int __filter_pid(PROCESSENTRY32W * pe, DWORD pid)
     return pe->th32ProcessID == pid;
 }
 
+/*
+FIXME: causes FILETIME to conflict
 static void __filetime2timeval(FILETIME time, struct timeval * out)
 {
     unsigned long long value = time.dwHighDateTime;
@@ -330,6 +340,7 @@ static void __filetime2timeval(FILETIME time, struct timeval * out)
     out->tv_sec = (long)(value / 1000000);
     out->tv_usec = (long)(value % 1000000);
 }
+*/
 
 static int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * infop, struct rusage * rusage)
 {
@@ -423,12 +434,15 @@ static int __waitpid_internal(pid_t pid, int * status, int options, siginfo_t * 
     if (rusage)
     {
         memset(rusage, 0, sizeof(*rusage));
+        /*
+        FIXME: causes FILETIME to conflict
         FILETIME creation_time, exit_time, kernel_time, user_time;
         if (GetProcessTimes(hProcess, &creation_time, &exit_time, &kernel_time, &user_time))
         {
              __filetime2timeval(kernel_time, &rusage->ru_stime);
              __filetime2timeval(user_time, &rusage->ru_utime);
         }
+        */
     }
     if (infop)
     {
