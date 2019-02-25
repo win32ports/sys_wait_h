@@ -48,8 +48,19 @@ extern "C" {
 
 typedef unsigned long DWORD;
 typedef DWORD * LPDWORD;
+
+#ifdef _WIN64
+
 typedef long long LONG_PTR;
 typedef unsigned long long ULONG_PTR;
+
+#else /* _WIN64 */
+
+typedef long LONG_PTR;
+typedef unsigned long ULONG_PTR;
+
+#endif
+
 typedef long LONG;
 typedef wchar_t WCHAR;
 typedef int BOOL;
