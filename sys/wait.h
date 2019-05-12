@@ -240,12 +240,12 @@ BOOL WINAPI Process32NextW(HANDLE hSnapshot, LPPROCESSENTRY32W lppe);
 #define WSTOPSIG(status) __WSTOPSIG(status)
 #endif /* WSTOPSIG */
 
-#if !defined(__pid_t_defined) && !defined(_PID_T_)
+#if !defined(__pid_t_defined) && !defined(_PID_T_) && !defined(pid_t)
 #define __pid_t_defined 1
 #define _PID_T_
 typedef int __pid_t;
 typedef __pid_t pid_t;
-#endif /* !defined(__pid_t_defined) && !defined(_PID_T_) */
+#endif /* !defined(__pid_t_defined) && !defined(_PID_T_) && !defined(pid_t) */
 
 #ifndef __id_t_defined
 #define __id_t_defined 1
